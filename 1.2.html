@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>API 钥匙扣 · 分类 · 标签 · 链接</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== 主题变量 ===== */
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --primary-bg: #eef2ff;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --max-width: 1200px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .app {
+            max-width: var(--max-width);
+            width: 100%;
+            margin: 0 auto;
+        }
+        /* ===== 头部 ===== */
+        .app-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding: 20px 24px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .app-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .app-header-left .logo {
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 22px;
+        }
+        .app-header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .app-header-left h1 span { color: var(--primary); }
+        .app-header-left .badge {
+            font-size: 13px;
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+        .app-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .app-header-right .stats {
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .app-header-right .stats strong { color: var(--text); }
+        /* ===== 按钮 ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.30);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99,102,241,0.35);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+        .btn-danger {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .btn-danger:hover { background: #fee2e2; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px; background: transparent; border: none;
+            color: var(--text-muted); cursor: pointer; transition: var(--transition);
+        }
+        .btn-icon:hover { background: var(--bg); color: var(--text); }
+        .btn-icon.danger:hover { background: #fef2f2; color: #dc2626; }
+        .btn-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border-radius: 20px; font-size: 13px;
+            background: var(--primary-bg); color: var(--primary-dark);
+            text-decoration: none; transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .btn-link:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        /* ===== 搜索栏 ===== */
+        .search-bar {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            margin-bottom: 28px; background: var(--card-bg);
+            padding: 16px 20px; border-radius: var(--radius);
+            box-shadow: var(--shadow); align-items: center;
+        }
+        .search-bar .search-input-wrap {
+            flex: 2; min-width: 160px; position: relative;
+        }
+        .search-bar .search-input-wrap i {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted); font-size: 15px;
+        }
+        .search-bar .search-input-wrap input {
+            width: 100%; padding: 10px 14px 10px 42px;
+            border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 14px; font-family: var(--font);
+            background: var(--bg); transition: var(--transition);
+            outline: none; color: var(--text);
+        }
+        .search-bar .search-input-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+            background: #fff;
+        }
+        .search-bar .filter-group {
+            display: flex; gap: 8px; flex-wrap: wrap; flex: 3;
+        }
+        .search-bar .filter-group select,
+        .search-bar .filter-group input {
+            padding: 10px 14px; border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm); font-size: 14px;
+            font-family: var(--font); background: var(--bg);
+            color: var(--text); outline: none; transition: var(--transition);
+            min-width: 110px; flex: 1;
+        }
+        .search-bar .filter-group select:focus,
+        .search-bar .filter-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+        }
+        /* ===== 卡片网格 ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        /* ===== API 卡片 ===== */
+        .api-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 22px 18px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+        .api-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--border);
+            transform: translateY(-2px);
+        }
+        .api-card .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .api-card .platform-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--platform-bg, #f3f4f6);
+            color: var(--platform-color, #6b7280);
+        }
+        .api-card .platform-tag i { font-size: 12px; }
+        .api-card .meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .api-card .meta-tags .tag {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .api-card .meta-tags .tag i {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .api-card .meta-tags .category-tag {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            border-color: var(--primary-light);
+            font-weight: 500;
+        }
+        .api-card .card-actions {
+            display: flex;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .api-card .card-actions .collapse-btn {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .api-card .card-actions .collapse-btn.collapsed {
+            transform: rotate(-90deg);
+        }
+        .api-card .card-body {
+            flex: 1;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 1000px;
+            opacity: 1;
+            overflow: hidden;
+        }
+        .api-card .card-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            margin-top: 0;
+        }
+        .api-card .account-name {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+            word-break: break-word;
+        }
+        .api-card .field-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            border-bottom-width: 1px;
+            border-bottom-style: dashed;
+        }
+        .api-card .field-row:last-of-type { border-bottom: none; }
+        .api-card .field-row .label {
+            font-weight: 500;
+            color: var(--text-muted);
+            min-width: 28px;
+            font-size: 13px;
+        }
+        .api-card .field-row .value {
+            flex: 1;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            color: var(--text);
+            word-break: break-all;
+            letter-spacing: 0.2px;
+        }
+        .api-card .field-row .value.hidden {
+            font-family: inherit;
+            letter-spacing: 4px;
+            color: var(--text-muted);
+        }
+        .api-card .field-row .copy-btn,
+        .api-card .field-row .toggle-btn {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .api-card .field-row .copy-btn:hover,
+        .api-card .field-row .toggle-btn:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+        .api-card .card-footer {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .api-card .card-footer .time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .api-card .card-footer .admin-link { margin-left: auto; }
+        /* ===== 模态框通用 ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.50);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            max-width: 540px;
+            width: 100%;
+            padding: 32px 28px 28px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.20);
+            transform: scale(0.92) translateY(12px);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+        .modal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .modal .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal .modal-header .close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg);
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal .modal-header .close-btn:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .modal .form-group {
+            margin-bottom: 18px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        .modal .form-group label .required { color: #dc2626; margin-left: 2px; }
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: var(--font);
+            background: var(--bg);
+            transition: var(--transition);
+            outline: none;
+            color: var(--text);
+        }
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+            background: #fff;
+        }
+        .modal .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .modal .form-group .hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .modal .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .empty-state .empty-icon {
+            font-size: 56px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto 20px;
+            font-size: 15px;
+        }
+        /* ===== Toast ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000;
+            max-width: 360px;
+            width: 100%;
+        }
+        .toast {
+            background: var(--text);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.35s ease forwards;
+            transform-origin: bottom;
+        }
+        .toast.success { background: #065f46; }
+        .toast.error { background: #991b1b; }
+        .toast.info { background: #1e40af; }
+        .toast i { font-size: 18px; }
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* ===== 帮助内容 ===== */
+        .help-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .help-content h3 {
+            color: var(--text);
+            margin: 16px 0 8px;
+        }
+        .help-content ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+        .help-content ul li { margin-bottom: 4px; }
+        .help-content .key {
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .help-content .signature {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-style: italic;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .search-bar .filter-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-bar .filter-group select,
+            .search-bar .filter-group input {
+                min-width: unset;
+                width: 100%;
+            }
+            .search-bar .search-input-wrap { width: 100%; }
+            .app-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .app-header-right {
+                justify-content: space-between;
+            }
+            .card-grid { grid-template-columns: 1fr; }
+            .modal { padding: 24px 18px 20px; }
+        }
+        @media (max-width: 480px) {
+            .app-header-left h1 { font-size: 19px; }
+            .app-header-left .badge { display: none; }
+            .btn { padding: 8px 14px; font-size: 13px; }
+        }
+        .modal::-webkit-scrollbar { width: 4px; }
+        .modal::-webkit-scrollbar-track { background: transparent; }
+        .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        /* 平台色 */
+        .platform-deepseek { --platform-color: #4f46e5; --platform-bg: #eef2ff; }
+        .platform-zhipu { --platform-color: #7c3aed; --platform-bg: #f5f3ff; }
+        .platform-openai { --platform-color: #10a37f; --platform-bg: #ecfdf5; }
+        .platform-baidu { --platform-color: #2563eb; --platform-bg: #eff6ff; }
+        .platform-alibaba { --platform-color: #dc2626; --platform-bg: #fef2f2; }
+        .platform-gaode { --platform-color: #e67e22; --platform-bg: #fef9e7; }
+        .platform-other { --platform-color: #6b7280; --platform-bg: #f3f4f6; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- 头部 -->
+    <header class="app-header">
+        <div class="app-header-left">
+            <div class="logo"><i class="fas fa-tags"></i></div>
+            <h1>API <span>钥匙扣</span></h1>
+            <span class="badge">分类 · 标签 · 链接</span>
+        </div>
+        <div class="app-header-right">
+            <span class="stats" id="statsCount"><strong>0</strong> 个 API</span>
+            <button class="btn btn-primary btn-sm" id="openAddBtn"><i class="fas fa-plus"></i> 添加</button>
+            <button class="btn btn-outline btn-sm" id="exportBtn"><i class="fas fa-file-export"></i> 导出CSV</button>
+            <button class="btn btn-outline btn-sm" id="helpBtn"><i class="fas fa-question-circle"></i> 帮助</button>
+        </div>
+    </header>
+
+    <!-- 搜索与筛选 -->
+    <div class="search-bar">
+        <div class="search-input-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索平台、账号、ID、分类、标签..." />
+        </div>
+        <div class="filter-group">
+            <select id="platformFilter"><option value="">全部平台</option></select>
+            <select id="categoryFilter"><option value="">全部分类</option></select>
+            <select id="tagFilter"><option value="">全部标签</option></select>
+            <button class="btn btn-outline btn-sm" id="clearFilterBtn"><i class="fas fa-times"></i> 重置</button>
+        </div>
+    </div>
+
+    <!-- 卡片网格 -->
+    <div id="cardGrid" class="card-grid"></div>
+
+    <!-- 空状态 -->
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-icon"><i class="fas fa-tags"></i></div>
+        <h3>还没有 API 记录</h3>
+        <p>点击「添加」按钮，开始记录你的 API 凭证。</p>
+        <button class="btn btn-primary" id="emptyAddBtn"><i class="fas fa-plus"></i> 添加第一个 API</button>
+    </div>
+</div>
+
+<!-- ===== API 编辑模态框 ===== -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modalTitle">添加 API</h2>
+            <button class="close-btn" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="apiForm" autocomplete="off">
+            <input type="hidden" id="editId" value="" />
+
+            <div class="form-group">
+                <label>平台 <span class="required">*</span></label>
+                <input type="text" id="formPlatform" list="platformList" placeholder="例如：DeepSeek、高德地图、智谱 AI" required />
+                <datalist id="platformList">
+                    <option value="DeepSeek">
+                    <option value="智谱 AI">
+                    <option value="OpenAI">
+                    <option value="百度文心">
+                    <option value="阿里通义">
+                    <option value="高德地图">
+                    <option value="腾讯地图">
+                    <option value="MCP 服务">
+                </datalist>
+                <div class="hint">支持自定义输入，常用平台已预设</div>
+            </div>
+
+            <div class="form-group">
+                <label>账号名称 <span class="required">*</span></label>
+                <input type="text" id="formAccount" placeholder="例如：个人开发账号" required />
+            </div>
+
+            <div class="form-group">
+                <label>分类</label>
+                <input type="text" id="formCategory" placeholder="例如：AI、地图、云服务、工具" list="categoryList" />
+                <datalist id="categoryList">
+                    <option value="AI">
+                    <option value="地图">
+                    <option value="云服务">
+                    <option value="工具">
+                    <option value="消息">
+                    <option value="存储">
+                </datalist>
+                <div class="hint">自定义分类，便于分组筛选</div>
+            </div>
+
+            <div class="form-group">
+                <label>标签（逗号分隔）</label>
+                <input type="text" id="formTags" placeholder="例如：生产, 测试, 个人, 团队" />
+                <div class="hint">多个标签用英文逗号分隔</div>
+            </div>
+
+            <div class="form-group">
+                <label>API ID <span class="required">*</span></label>
+                <input type="text" id="formApiId" placeholder="sk-xxx 或 api-xxx" required />
+            </div>
+
+            <div class="form-group">
+                <label>API Key <span class="required">*</span></label>
+                <input type="text" id="formApiKey" placeholder="sk-xxx 或密钥字符串" required />
+            </div>
+
+            <div class="form-group">
+                <label>管理后台链接</label>
+                <input type="url" id="formAdminUrl" placeholder="https://console.deepseek.com/api" list="adminUrlList" />
+                <datalist id="adminUrlList">
+                    <option value="https://console.deepseek.com/api">
+                    <option value="https://open.bigmodel.cn/usercenter/apikeys">
+                    <option value="https://platform.moonshot.cn/console/api-keys">
+                    <option value="https://console.amap.com/">
+                    <option value="https://bailian.console.aliyun.com/">
+                    <option value="https://platform.openai.com/api-keys">
+                    <option value="https://console.cloud.tencent.com/cam/capi">
+                    <option value="https://console.bce.baidu.com/iam/#/iam/apikey/list">
+                </datalist>
+                <div class="hint">用于快速跳转至该平台的管理后台，查看用量、账单或管理密钥</div>
+            </div>
+
+            <div class="form-group">
+                <label>备注（可选）</label>
+                <textarea id="formNotes" placeholder="记录用途、限额、到期时间等..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="modalCancelBtn">取消</button>
+                <button type="submit" class="btn btn-primary" id="modalSubmitBtn">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== 帮助模态框 ===== -->
+<div class="modal-overlay" id="helpModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-question-circle" style="margin-right:8px;"></i>帮助文档</h2>
+            <button class="close-btn" id="helpCloseBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="help-content">
+            <h3>📌 基本功能</h3>
+            <ul>
+                <li><strong>添加 API：</strong>点击「添加」按钮，填写平台、账号、分类、标签、API ID、API Key、管理后台链接和备注。</li>
+                <li><strong>编辑/删除：</strong>每个卡片右上角有编辑（✎）和删除（🗑）按钮。</li>
+                <li><strong>搜索：</strong>支持搜索平台、账号、API ID、分类、标签、链接地址。</li>
+                <li><strong>筛选：</strong>按平台、分类、标签进行筛选，可组合使用。</li>
+            </ul>
+            <h3>🔐 安全与隐私</h3>
+            <ul>
+                <li><strong>API Key 隐藏：</strong>默认显示为掩码，点击眼睛图标可切换明文/密文。</li>
+                <li><strong>复制功能：</strong>每个字段旁的复制按钮可快速复制内容。</li>
+            </ul>
+            <h3>📁 卡片折叠</h3>
+            <ul>
+                <li>每个卡片头部右侧有一个折叠按钮（⬇/⬆），点击可折叠/展开卡片主体，只保留标题区域（平台、账号、标签、操作按钮）。</li>
+            </ul>
+            <h3>📤 导出 CSV</h3>
+            <ul>
+                <li>点击「导出CSV」按钮，将当前筛选后的所有 API 记录导出为 CSV 文件，方便数据分析或备份。</li>
+            </ul>
+            <h3>💡 小提示</h3>
+            <ul>
+                <li>所有数据保存在浏览器的本地存储中，清除浏览器数据会导致丢失，建议定期导出备份。</li>
+                <li>管理后台链接支持自定义，方便快速跳转至对应平台的控制台。</li>
+            </ul>
+            <div class="signature">
+                Lingeos Family Deepseek vibe coding 2026 June
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    // ============================================================
+    //  DATA LAYER (单用户模式)
+    // ============================================================
+    const STORAGE_KEY = 'api_keychain_data';
+
+    function loadData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const data = JSON.parse(raw);
+                data.forEach(item => {
+                    if (item.adminUrl === undefined) item.adminUrl = '';
+                    if (!item._hiddenKeys) item._hiddenKeys = { apiId: false, apiKey: true };
+                    if (item.category === undefined) item.category = '';
+                    if (item.tags === undefined) item.tags = '';
+                    if (item._collapsed === undefined) item._collapsed = false;
+                });
+                return data;
+            }
+            return [];
+        } catch { return []; }
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ============================================================
+    //  GLOBALS
+    // ============================================================
+    const PLATFORM_COLORS = {
+        deepseek: { label: 'DeepSeek', icon: 'fa-bolt', color: '#4f46e5', bg: '#eef2ff' },
+        zhipu: { label: '智谱 AI', icon: 'fa-brain', color: '#7c3aed', bg: '#f5f3ff' },
+        openai: { label: 'OpenAI', icon: 'fa-robot', color: '#10a37f', bg: '#ecfdf5' },
+        baidu: { label: '百度文心', icon: 'fa-feather', color: '#2563eb', bg: '#eff6ff' },
+        alibaba: { label: '阿里通义', icon: 'fa-cloud', color: '#dc2626', bg: '#fef2f2' },
+        gaode: { label: '高德地图', icon: 'fa-map', color: '#e67e22', bg: '#fef9e7' },
+        other: { label: '其他', icon: 'fa-cube', color: '#6b7280', bg: '#f3f4f6' },
+    };
+
+    function getPlatformMeta(key) {
+        const lower = key.toLowerCase();
+        for (const [k, v] of Object.entries(PLATFORM_COLORS)) {
+            if (k === lower) return v;
+            if (v.label.toLowerCase() === lower) return v;
+        }
+        return PLATFORM_COLORS.other;
+    }
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    function formatTime(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return d.toLocaleString('zh-CN', { hour12: false });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function maskString(str) {
+        if (!str) return '';
+        if (str.length <= 8) return '•'.repeat(str.length);
+        const head = str.slice(0, 4);
+        const tail = str.slice(-4);
+        return head + '••••' + tail;
+    }
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    let apiData = loadData();
+    let editingId = null;
+    let searchQuery = '';
+    let platformFilter = '';
+    let categoryFilter = '';
+    let tagFilter = '';
+
+    // ============================================================
+    //  DOM REFS
+    // ============================================================
+    const $ = (sel) => document.querySelector(sel);
+    const grid = $('#cardGrid');
+    const emptyState = $('#emptyState');
+    const statsCount = $('#statsCount');
+    const searchInput = $('#searchInput');
+    const platformFilterEl = $('#platformFilter');
+    const categoryFilterEl = $('#categoryFilter');
+    const tagFilterEl = $('#tagFilter');
+    const clearFilterBtn = $('#clearFilterBtn');
+
+    const modalOverlay = $('#modalOverlay');
+    const modalTitle = $('#modalTitle');
+    const modalCloseBtn = $('#modalCloseBtn');
+    const modalCancelBtn = $('#modalCancelBtn');
+    const openAddBtn = $('#openAddBtn');
+    const emptyAddBtn = $('#emptyAddBtn');
+    const apiForm = $('#apiForm');
+    const editId = $('#editId');
+    const formPlatform = $('#formPlatform');
+    const formAccount = $('#formAccount');
+    const formCategory = $('#formCategory');
+    const formTags = $('#formTags');
+    const formApiId = $('#formApiId');
+    const formApiKey = $('#formApiKey');
+    const formAdminUrl = $('#formAdminUrl');
+    const formNotes = $('#formNotes');
+    const modalSubmitBtn = $('#modalSubmitBtn');
+
+    const helpModal = $('#helpModal');
+    const helpCloseBtn = $('#helpCloseBtn');
+    const helpBtn = $('#helpBtn');
+
+    const exportBtn = $('#exportBtn');
+
+    const toastContainer = $('#toastContainer');
+
+    // ============================================================
+    //  TOAST
+    // ============================================================
+    function showToast(message, type = 'info', duration = 2800) {
+        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(12px) scale(0.96)';
+            toast.style.transition = '0.25s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    // ============================================================
+    //  RENDER
+    // ============================================================
+    function render() {
+        let filtered = apiData.slice();
+        const q = searchQuery.trim().toLowerCase();
+        if (q) {
+            filtered = filtered.filter(item =>
+                item.account.toLowerCase().includes(q) ||
+                item.platform.toLowerCase().includes(q) ||
+                (item.apiId && item.apiId.toLowerCase().includes(q)) ||
+                (item.notes && item.notes.toLowerCase().includes(q)) ||
+                (item.category && item.category.toLowerCase().includes(q)) ||
+                (item.tags && item.tags.toLowerCase().includes(q)) ||
+                (item.adminUrl && item.adminUrl.toLowerCase().includes(q))
+            );
+        }
+        if (platformFilter) {
+            filtered = filtered.filter(item => item.platform.toLowerCase() === platformFilter.toLowerCase());
+        }
+        if (categoryFilter) {
+            filtered = filtered.filter(item => (item.category || '').toLowerCase() === categoryFilter.toLowerCase());
+        }
+        if (tagFilter) {
+            filtered = filtered.filter(item => {
+                const tags = (item.tags || '').split(',').map(t => t.trim().toLowerCase());
+                return tags.includes(tagFilter.toLowerCase());
+            });
+        }
+
+        statsCount.innerHTML = `<strong>${filtered.length}</strong> 个 API`;
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            emptyState.style.display = 'block';
+            if (apiData.length === 0) {
+                emptyState.querySelector('p').textContent = '点击「添加」按钮，开始记录你的 API 凭证。';
+            } else {
+                emptyState.querySelector('p').textContent = '没有匹配的 API 记录，试试调整搜索或筛选条件。';
+            }
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        let html = '';
+        filtered.forEach(item => {
+            const meta = getPlatformMeta(item.platform);
+            const platformClass = `platform-${item.platform.toLowerCase()}`;
+            const isHidden = item._hiddenKeys || {};
+            const collapsed = item._collapsed || false;
+
+            const apiIdDisplay = isHidden.apiId ? maskString(item.apiId) : item.apiId;
+            const apiKeyDisplay = isHidden.apiKey ? maskString(item.apiKey) : item.apiKey;
+            const apiIdHidden = isHidden.apiId || false;
+            const apiKeyHidden = isHidden.apiKey || false;
+
+            const tagsArray = (item.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+            const category = item.category || '';
+            const adminUrl = item.adminUrl || '';
+
+            html += `
+                <div class="api-card ${platformClass}" data-id="${item.id}">
+                    <div class="card-top">
+                        <div>
+                            <span class="platform-tag">
+                                <i class="fas ${meta.icon}"></i> ${escapeHtml(item.platform)}
+                            </span>
+                            <div class="meta-tags">
+                                ${category ? `<span class="tag category-tag"><i class="fas fa-folder"></i> ${escapeHtml(category)}</span>` : ''}
+                                ${tagsArray.map(t => `<span class="tag"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-icon collapse-btn ${collapsed ? 'collapsed' : ''}" onclick="toggleCollapse('${item.id}')" title="折叠/展开">
+                                <i class="fas ${collapsed ? 'fa-chevron-right' : 'fa-chevron-down'}"></i>
+                            </button>
+                            <button class="btn-icon" onclick="editItem('${item.id}')" title="编辑">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="btn-icon danger" onclick="deleteItem('${item.id}')" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body ${collapsed ? 'collapsed' : ''}">
+                        <div class="account-name">${escapeHtml(item.account)}</div>
+                        <div class="field-row">
+                            <span class="label"><i class="fas fa-id-card"></i></span>
+                            <span class="value ${apiIdHidden ? 'hidden' : ''}" id="id-val-${item.id}">${escapeHtml(apiIdDisplay)}</span>
+                            <button class="toggle-btn" onclick="toggleVisibility('${item.id}', 'apiId')" title="切换显示">
+                                <i class="fas ${apiIdHidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                            </button>
+                            <button class="copy-btn" onclick="copyText('${item.apiId}', 'API ID')" title="复制">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="field-row">
+                            <span class="label"><i class="fas fa-key"></i></span>
+                            <span class="value ${apiKeyHidden ? 'hidden' : ''}" id="key-val-${item.id}">${escapeHtml(apiKeyDisplay)}</span>
+                            <button class="toggle-btn" onclick="toggleVisibility('${item.id}', 'apiKey')" title="切换显示">
+                                <i class="fas ${apiKeyHidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                            </button>
+                            <button class="copy-btn" onclick="copyText('${item.apiKey}', 'API Key')" title="复制">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        ${item.notes ? `<div style="margin-top:8px;font-size:13px;color:var(--text-secondary);background:var(--bg);padding:6px 10px;border-radius:6px;word-break:break-word;"><i class="fas fa-pencil-alt" style="margin-right:6px;color:var(--text-muted);"></i>${escapeHtml(item.notes)}</div>` : ''}
+                    </div>
+                    <div class="card-footer">
+                        <span class="time"><i class="far fa-clock"></i> ${formatTime(item.createdAt)}</span>
+                        ${item.updatedAt && item.updatedAt !== item.createdAt ? `<span class="time"><i class="fas fa-edit"></i> ${formatTime(item.updatedAt)}</span>` : ''}
+                        ${adminUrl ? `<a href="${escapeHtml(adminUrl)}" target="_blank" class="btn-link admin-link" title="跳转管理后台"><i class="fas fa-external-link-alt"></i> 管理后台</a>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+        updateFilterOptions();
+    }
+
+    function updateFilterOptions() {
+        const platforms = new Set();
+        const categories = new Set();
+        const tags = new Set();
+        apiData.forEach(item => {
+            platforms.add(item.platform);
+            if (item.category) categories.add(item.category);
+            if (item.tags) {
+                item.tags.split(',').forEach(t => {
+                    const trimmed = t.trim();
+                    if (trimmed) tags.add(trimmed);
+                });
+            }
+        });
+
+        const currentPlatform = platformFilterEl.value;
+        platformFilterEl.innerHTML = '<option value="">全部平台</option>';
+        [...platforms].sort().forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            platformFilterEl.appendChild(opt);
+        });
+        if ([...platformFilterEl.options].some(o => o.value === currentPlatform)) {
+            platformFilterEl.value = currentPlatform;
+        } else {
+            platformFilterEl.value = '';
+        }
+
+        const currentCategory = categoryFilterEl.value;
+        categoryFilterEl.innerHTML = '<option value="">全部分类</option>';
+        [...categories].sort().forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            categoryFilterEl.appendChild(opt);
+        });
+        if ([...categoryFilterEl.options].some(o => o.value === currentCategory)) {
+            categoryFilterEl.value = currentCategory;
+        } else {
+            categoryFilterEl.value = '';
+        }
+
+        const currentTag = tagFilterEl.value;
+        tagFilterEl.innerHTML = '<option value="">全部标签</option>';
+        [...tags].sort().forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            tagFilterEl.appendChild(opt);
+        });
+        if ([...tagFilterEl.options].some(o => o.value === currentTag)) {
+            tagFilterEl.value = currentTag;
+        } else {
+            tagFilterEl.value = '';
+        }
+    }
+
+    // ============================================================
+    //  CRUD
+    // ============================================================
+    function addItem(data) {
+        const now = new Date().toISOString();
+        const item = {
+            id: generateId(),
+            platform: data.platform.trim(),
+            account: data.account.trim(),
+            category: (data.category || '').trim(),
+            tags: (data.tags || '').trim(),
+            apiId: data.apiId.trim(),
+            apiKey: data.apiKey.trim(),
+            adminUrl: (data.adminUrl || '').trim(),
+            notes: (data.notes || '').trim(),
+            createdAt: now,
+            updatedAt: now,
+            _hiddenKeys: { apiId: false, apiKey: true },
+            _collapsed: false,
+        };
+        apiData.push(item);
+        saveData(apiData);
+        render();
+        showToast('✅ API 添加成功', 'success');
+    }
+
+    function updateItem(id, data) {
+        const index = apiData.findIndex(item => item.id === id);
+        if (index === -1) return;
+        const item = apiData[index];
+        item.platform = data.platform.trim();
+        item.account = data.account.trim();
+        item.category = (data.category || '').trim();
+        item.tags = (data.tags || '').trim();
+        item.apiId = data.apiId.trim();
+        item.apiKey = data.apiKey.trim();
+        item.adminUrl = (data.adminUrl || '').trim();
+        item.notes = (data.notes || '').trim();
+        item.updatedAt = new Date().toISOString();
+        saveData(apiData);
+        render();
+        showToast('✅ API 更新成功', 'success');
+    }
+
+    function deleteItem(id) {
+        if (!confirm('确定要删除这个 API 记录吗？')) return;
+        apiData = apiData.filter(item => item.id !== id);
+        saveData(apiData);
+        render();
+        showToast('🗑️ 已删除', 'info');
+    }
+
+    function editItem(id) {
+        const item = apiData.find(d => d.id === id);
+        if (!item) return;
+        editingId = id;
+        modalTitle.textContent = '编辑 API';
+        modalSubmitBtn.innerHTML = '<i class="fas fa-save"></i> 更新';
+        editId.value = id;
+        formPlatform.value = item.platform;
+        formAccount.value = item.account;
+        formCategory.value = item.category || '';
+        formTags.value = item.tags || '';
+        formApiId.value = item.apiId;
+        formApiKey.value = item.apiKey;
+        formAdminUrl.value = item.adminUrl || '';
+        formNotes.value = item.notes || '';
+        openModal();
+    }
+
+    function toggleCollapse(id) {
+        const item = apiData.find(d => d.id === id);
+        if (!item) return;
+        item._collapsed = !item._collapsed;
+        saveData(apiData);
+        render();
+    }
+
+    function toggleVisibility(id, field) {
+        const item = apiData.find(d => d.id === id);
+        if (!item) return;
+        if (!item._hiddenKeys) item._hiddenKeys = { apiId: false, apiKey: true };
+        item._hiddenKeys[field] = !item._hiddenKeys[field];
+        saveData(apiData);
+        render();
+    }
+
+    function copyText(text, label) {
+        if (!text) {
+            showToast('❌ 没有内容可复制', 'error');
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`📋 ${label} 已复制`, 'success');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            showToast(`📋 ${label} 已复制`, 'success');
+        });
+    }
+
+    // ============================================================
+    //  EXPORT CSV
+    // ============================================================
+    function exportCSV() {
+        let filtered = apiData.slice();
+        const q = searchQuery.trim().toLowerCase();
+        if (q) {
+            filtered = filtered.filter(item =>
+                item.account.toLowerCase().includes(q) ||
+                item.platform.toLowerCase().includes(q) ||
+                (item.apiId && item.apiId.toLowerCase().includes(q)) ||
+                (item.notes && item.notes.toLowerCase().includes(q)) ||
+                (item.category && item.category.toLowerCase().includes(q)) ||
+                (item.tags && item.tags.toLowerCase().includes(q)) ||
+                (item.adminUrl && item.adminUrl.toLowerCase().includes(q))
+            );
+        }
+        if (platformFilter) {
+            filtered = filtered.filter(item => item.platform.toLowerCase() === platformFilter.toLowerCase());
+        }
+        if (categoryFilter) {
+            filtered = filtered.filter(item => (item.category || '').toLowerCase() === categoryFilter.toLowerCase());
+        }
+        if (tagFilter) {
+            filtered = filtered.filter(item => {
+                const tags = (item.tags || '').split(',').map(t => t.trim().toLowerCase());
+                return tags.includes(tagFilter.toLowerCase());
+            });
+        }
+
+        if (filtered.length === 0) {
+            showToast('没有数据可导出', 'info');
+            return;
+        }
+
+        const headers = ['平台', '账号', '分类', '标签', 'API ID', 'API Key', '管理后台链接', '备注', '创建时间', '更新时间'];
+        const rows = filtered.map(item => [
+            item.platform,
+            item.account,
+            item.category || '',
+            item.tags || '',
+            item.apiId,
+            item.apiKey,
+            item.adminUrl || '',
+            item.notes || '',
+            formatTime(item.createdAt),
+            formatTime(item.updatedAt),
+        ]);
+
+        let csvContent = headers.join(',') + '\n';
+        rows.forEach(row => {
+            const escaped = row.map(field => {
+                if (typeof field === 'string' && (field.includes(',') || field.includes('"') || field.includes('\n'))) {
+                    return `"${field.replace(/"/g, '""')}"`;
+                }
+                return field;
+            });
+            csvContent += escaped.join(',') + '\n';
+        });
+
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `api_export_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📤 CSV 导出成功', 'success');
+    }
+
+    // ============================================================
+    //  MODAL (API form)
+    // ============================================================
+    function openModal() {
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        apiForm.reset();
+        editId.value = '';
+        editingId = null;
+        modalTitle.textContent = '添加 API';
+        modalSubmitBtn.innerHTML = '<i class="fas fa-save"></i> 保存';
+        formPlatform.value = '';
+    }
+
+    // ============================================================
+    //  EVENT LISTENERS
+    // ============================================================
+    // 帮助
+    helpBtn.addEventListener('click', () => {
+        helpModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    helpCloseBtn.addEventListener('click', () => {
+        helpModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+            helpModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    exportBtn.addEventListener('click', exportCSV);
+
+    // 搜索
+    searchInput.addEventListener('input', () => {
+        searchQuery = searchInput.value;
+        render();
+    });
+    platformFilterEl.addEventListener('change', () => {
+        platformFilter = platformFilterEl.value;
+        render();
+    });
+    categoryFilterEl.addEventListener('change', () => {
+        categoryFilter = categoryFilterEl.value;
+        render();
+    });
+    tagFilterEl.addEventListener('change', () => {
+        tagFilter = tagFilterEl.value;
+        render();
+    });
+    clearFilterBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        platformFilterEl.value = '';
+        categoryFilterEl.value = '';
+        tagFilterEl.value = '';
+        searchQuery = '';
+        platformFilter = '';
+        categoryFilter = '';
+        tagFilter = '';
+        render();
+    });
+
+    openAddBtn.addEventListener('click', () => {
+        editingId = null;
+        modalTitle.textContent = '添加 API';
+        modalSubmitBtn.innerHTML = '<i class="fas fa-save"></i> 保存';
+        editId.value = '';
+        apiForm.reset();
+        formPlatform.value = '';
+        openModal();
+    });
+    emptyAddBtn.addEventListener('click', () => {
+        openAddBtn.click();
+    });
+
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalCancelBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+    });
+
+    apiForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const platform = formPlatform.value.trim();
+        const account = formAccount.value.trim();
+        const category = formCategory.value.trim();
+        const tags = formTags.value.trim();
+        const apiId = formApiId.value.trim();
+        const apiKey = formApiKey.value.trim();
+        const adminUrl = formAdminUrl.value.trim();
+        const notes = formNotes.value.trim();
+
+        if (!platform) { showToast('请输入平台名称', 'error'); return; }
+        if (!account) { showToast('请输入账号名称', 'error'); return; }
+        if (!apiId) { showToast('请输入 API ID', 'error'); return; }
+        if (!apiKey) { showToast('请输入 API Key', 'error'); return; }
+
+        const data = { platform, account, category, tags, apiId, apiKey, adminUrl, notes };
+        if (editingId) {
+            updateItem(editingId, data);
+        } else {
+            addItem(data);
+        }
+        closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (modalOverlay.classList.contains('active')) closeModal();
+            if (helpModal.classList.contains('active')) {
+                helpModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    // 如果没有任何数据，添加示例数据
+    if (apiData.length === 0) {
+        const demo = [{
+            id: generateId(),
+            platform: 'DeepSeek',
+            account: '个人开发账号',
+            category: 'AI',
+            tags: '个人, 测试',
+            apiId: 'ds-api-1234567890',
+            apiKey: 'sk-demo1234567890abcdefghijklmnopqrstuvwxyz',
+            adminUrl: 'https://console.deepseek.com/api',
+            notes: '用于个人项目测试，每日限额 1000 次',
+            createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+            updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+            _hiddenKeys: { apiId: false, apiKey: true },
+            _collapsed: false,
+        }, {
+            id: generateId(),
+            platform: '智谱 AI',
+            account: '团队共享账号',
+            category: 'AI',
+            tags: '团队, 生产',
+            apiId: 'zp-api-9876543210',
+            apiKey: 'zhipu-sk-demo9876543210abcdefghijklmnopqrstuv',
+            adminUrl: 'https://open.bigmodel.cn/usercenter/apikeys',
+            notes: '团队内部使用，注意限额',
+            createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+            updatedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+            _hiddenKeys: { apiId: false, apiKey: true },
+            _collapsed: false,
+        }, {
+            id: generateId(),
+            platform: '高德地图',
+            account: 'Web 端 JS API',
+            category: '地图',
+            tags: '个人, 生产',
+            apiId: 'gaode-web-xxx',
+            apiKey: 'your-gaode-key-xxxxxxxxxxxxxxxxxxxxxxxx',
+            adminUrl: 'https://console.amap.com/',
+            notes: '用于网页端地图展示，需绑定域名',
+            createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+            updatedAt: new Date(Date.now() - 86400000 * 6).toISOString(),
+            _hiddenKeys: { apiId: false, apiKey: true },
+            _collapsed: false,
+        }, {
+            id: generateId(),
+            platform: 'OpenAI',
+            account: 'GPT-4 测试账号',
+            category: 'AI',
+            tags: '测试, 个人',
+            apiId: 'org-xxxxxxxxxxxxx',
+            apiKey: 'sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            adminUrl: 'https://platform.openai.com/api-keys',
+            notes: 'GPT-4 128k 上下文，月付',
+            createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+            updatedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+            _hiddenKeys: { apiId: false, apiKey: true },
+            _collapsed: false,
+        }];
+        apiData = demo;
+        saveData(apiData);
+    }
+
+    render();
+
+    // 暴露全局函数给 onclick
+    window.editItem = editItem;
+    window.deleteItem = deleteItem;
+    window.toggleVisibility = toggleVisibility;
+    window.copyText = copyText;
+    window.toggleCollapse = toggleCollapse;
+
+    console.log('🔑 API 钥匙扣 (无登录版本) 已启动');
+    console.log('📦 数据存储在 localStorage 中，key:', STORAGE_KEY);
+    console.log('ℹ️ 帮助文档包含 Lingeos Family Deepseek vibe coding 2026 June');
+</script>
+</body>
+</html>
