@@ -72,7 +72,7 @@ MIT License
 
 如果您有任何问题或建议，请通过以下方式联系：
 
-- 作者：Lingeos Family
+- 作者：Lingoes Family
 - 项目：Deepseek vibe coding
 - 时间：2026年6月
 
